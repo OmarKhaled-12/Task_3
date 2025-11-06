@@ -23,12 +23,24 @@ export default function AllPerks() {
 
   // ==================== SIDE EFFECTS WITH useEffect HOOK ====================
 
- /*
- TODO: HOOKS TO IMPLEMENT
- * useEffect Hook #1: Initial Data Loading
- * useEffect Hook #2: Auto-search on Input Change
+  // useEffect Hook #1: Initial Data Loading
+  // Runs once when component mounts to load all perks
+  useEffect(() => {
+    loadAllPerks()
+  }, []) // Empty dependency array = runs only once on mount
 
-*/
+  // useEffect Hook #2: Auto-search on Input Change
+  // Implements debouncing - waits 500ms after user stops typing before searching
+  useEffect(() => {
+    // Set up a timeout to delay the API call
+    const timeoutId = setTimeout(() => {
+      loadAllPerks()
+    }, 500) // 500ms delay
+    
+    // Cleanup function - cancels the previous timeout if user keeps typing
+    // This prevents making API calls on every keystroke
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, merchantFilter]) // Re-run whenever search or filter changes
 
   
   useEffect(() => {
@@ -136,7 +148,8 @@ export default function AllPerks() {
                 type="text"
                 className="input"
                 placeholder="Enter perk name..."
-                
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <p className="text-xs text-zinc-500 mt-1">
                 Auto-searches as you type, or press Enter / click Search
@@ -151,7 +164,8 @@ export default function AllPerks() {
               </label>
               <select
                 className="input"
-                
+                value={merchantFilter}
+                onChange={(e) => setMerchantFilter(e.target.value)}
               >
                 <option value="">All Merchants</option>
                 
@@ -217,7 +231,7 @@ export default function AllPerks() {
           
           <Link
             key={perk._id}
-           
+            to={`/perks/${perk._id}`}
             className="card hover:shadow-lg transition-shadow cursor-pointer"
           >
             {/* Perk Title */}
